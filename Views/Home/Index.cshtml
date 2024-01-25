@@ -1,0 +1,115 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    var url = ViewData["url"];
+}
+
+
+
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portofolio </title>
+    <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+</head>
+<body>
+
+    <!-- Start Top Bar -->
+    <div class="top-bar"  >
+        <div class="top-bar-left"  >
+            <ul class="menu" >
+                <li class="menu-text">My Portofolio </li>
+            </ul>
+        </div>
+    </div>
+    <!-- End Top Bar -->
+
+    <div class="callout large primary"  >
+        <div class="row column text-center">
+            <h1>Portofolio By</h1>
+            <h2>Daniel Agus Alamsyah</h2>
+        </div>
+    </div>
+
+    <!-- We can now combine rows and columns when there's only one column in that row -->
+    <div class="row medium-8 large-7 columns">
+        <div class="blog-post">
+            <h3>Api</h3>
+            <p>I am using restsharp to call api from kemdikbud(try put my name here)</p>
+            <input type="text" id="searchmahasiswa" value="" placeholder="put name" />
+            <button class="button success" id="butsearch1">Search</button>
+            <div class="callout" id="resultsearch1"></div>
+            <button class='button success' id='butsave1' hidden> Save </button>
+        </div>
+
+        <div class="blog-post">
+            <div class="callout" id="saveresult">
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
+    <script>
+        $(document).foundation(); 
+        $("#butsave1").hide();
+        $("#butsearch1").on('click',function(e){
+            var a = $("#searchmahasiswa").val();
+            $("#searchmahasiswa").val("");
+            $.ajax({
+                url: "@url" + "/home/checkmygraduate",
+                data: { search : a },
+                context: document.body
+            }).done(function (e) {
+                $("#resultsearch1").html(e);
+                if (e.includes("Prodi")) {
+                    $("#butsave1").show();
+                }
+                else {
+                    $("#butsave1").hide();
+                }
+            });
+        
+        });
+        $("#butsave1").on('click',function(e){
+            var a = $("#resultsearch1").html();
+            if (a.includes("Prodi"))
+            {
+                $.ajax({
+                    url: "@url" + "/home/refreshmybox",
+                    data: { data: a },
+                    context: document.body
+                }).done(function (e) {
+                    $("#saveresult").html(e);
+                });
+            }
+        });
+
+        $("#saveresult").on('click','button[id^="delete"]', function (e) {
+            var a = $(this).data('id'); 
+                $.ajax({
+                    url: "@url" + "/home/delete",
+                    data: { data: a },
+                    context: document.body
+                }).done(function (e) {
+                    $("#saveresult").html(e);
+                }); 
+        });
+
+
+        $.ajax({
+            url: "@url" + "/home/refreshmybox", 
+            context: document.body
+        }).done(function (e) {
+            $("#saveresult").html(e); 
+        });
+
+    </script>
+</body>
+</html>
+
+
+
